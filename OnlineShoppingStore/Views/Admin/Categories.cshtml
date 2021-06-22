@@ -1,0 +1,57 @@
+﻿@model List<OnlineShoppingStore.DAL.Tbl_Category>
+@{
+    ViewBag.Title = "Categories";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Categories</h2>
+<div class="container-fluid">
+    <ol class="breadcrumb mb-3">
+        <li class="breadcrumb-item">
+            <a href="index.html">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">Categories</li>
+      
+    </ol>
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fas fa-table mr-1"></i>
+            Add New Category
+            <a href="../Admin/AddCategory" class="btn btn-danger pull-right fa fa-plus">Add New</a>
+
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered " id="dtBasicExample" width="100%" cellspacing="0" >
+                    <thead>
+                        <tr>
+                            <th>Sr. No. </th>
+                            <th>Category Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Sr. No. </th>
+                            <th>Category Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@(Model.IndexOf(item) + 1)</td>
+                                <td>@item.CategoryName</td>
+                                <td>@Html.ActionLink("Edit", "CategoryEdit", new { catId = item.CategoryId })</td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+

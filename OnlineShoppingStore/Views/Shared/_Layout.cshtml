@@ -1,0 +1,96 @@
+﻿@using OnlineShoppingStore.Models.Home;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+
+    @Styles.Render("~/Content/css")
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/fontawesome.css" rel="stylesheet" />
+    <link href="~/Content/MyMainLayout.css" rel="stylesheet" />
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+
+</head>
+<body>
+
+       <div class="navbar-wrapper">
+           <div class="container">
+
+               <nav class="navbar navbar-inverse  navbar-fixed-top">
+                   <div class="container">
+                       <div class="navbar-header">
+                           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                               <span class="sr-only">Toggle navigation</span>
+                               <span class="icon-bar"></span>
+                               <span class="icon-bar"></span>
+                               <span class="icon-bar"></span>
+                           </button>
+                           <ul class="nav navbar-nav navbar-right">
+                               <li class="dropdown">
+                                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Services <span class="caret"></span></a>
+                                   <ul class="dropdown-menu">
+                                       <li><a href="#">Irrigation</a></li>
+                                       <li><a href="#">Paultry</a></li>
+                                       <li><a href="#">Seedlings</a></li>
+                                       <li role="separator" class="divider"></li>
+                                       <li class="dropdown-header">Nav header</li>
+                                       <li><a href="#">Livestock Medicinal</a></li>
+                                       <li><a href="Account/Register">Become An Agent</a></li>
+                                   </ul>
+                               </li>
+                               </ul>
+                               <a class="navbar-brand" href="#">Online Famer's Choice</a>
+                       </div>
+                        <div id="navbar" class="navbar-collapse collapse">
+                            <ul class="nav navbar-nav">
+                                <li class="active"><a href="#">Home</a></li>
+                                <li><a href="Home/About">About Us</a></li>
+                                <li><a href="#">Projects</a></li>
+                                <li><a href="Home/Contact">Contact <i class="fa fa-phone"></i></a></li>
+                                <li class="active pull-right"><a href="Account/Register">Register</a></li>
+                                <li class="active pull-right"><a href="Account/Login">Login</a></li>
+                                <l class="nav navbar-nav navbar-right">
+                                    <li class="dropdown">
+                                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">Cart(3) <b class="caret"></b></a>
+                                        <ul class="dropdown-menu">
+                                            @if (Session["cart"] != null)
+                                            {
+                                                foreach (Item item in (List<Item>)Session["cart"])
+                                                {
+
+                                                    <li><a href="@Url.Action("RemoveFromCart", "Home", new {productId=item.Product.ProductId })">@item.Product.ProductName (@item.Quantity)<i class="fa fa-times"></i></a></li>
+
+                                                }
+
+                                            }
+
+
+                                            <li class="divider"></li>
+                                            <li><a href="@Url.Action("Checkout", "Home")">Checkout</a></li>
+                                        </ul>    
+                                        </l>                                                                          
+                                   </ul>
+                              </div>                     
+                         </div>                 
+                     </nav>
+                 </div>
+            </div>
+ 
+    
+   
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+  
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,58 @@
+﻿@using OnlineShoppingStore.Models.Home;
+@{
+    ViewBag.Title = "CheckoutDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>CheckoutDetails</h2>
+
+@if (Session["cart"] == null)
+{
+    <div class="alert-danger">
+        <strong>No Product Added to cart!</strong>
+    </div>
+}
+else
+{
+    <div class="card-body">
+        <div class="table-responsive">
+
+            <table class="table table-bordered" id="dtBasicExample" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Line Total</th>
+                        <th>Add</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ 
+                        int Total = 0;
+                    }
+                    @foreach (Item item in (List<Item>)Session["cart"])
+                    {
+
+                        int lineTotal = Convert.ToInt32(item.Quantity * item.Product.Price);
+                        Total = Convert.ToInt32(@Total + lineTotal);
+
+                        Session["SesTotal"] = Total;
+
+                    <tr>
+                        <td>@item.Product.ProductName</td>
+                        <td>@item.Product.Price</td>
+                        <td>@item.Quantity</td>
+                        <td>@lineTotal</td>
+                    </tr>
+                    }
+
+                <tr>
+                    <td colspan="4" class="text-right"><b>Total: @Total</b></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <a href="@Url.Action("PaymentWithPapal", "Payments")" class="btn btn-success" >Checkout >></a>
+}

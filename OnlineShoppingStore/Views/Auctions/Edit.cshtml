@@ -1,0 +1,145 @@
+﻿@model OnlineShoppingStore.ViewModels.CreateAuctionsViewModel
+
+<div class="modal-header">
+    <h5 class="modal-title">Edit Auction</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<form id="editForm" method="post">
+
+    <div class="modal-body">
+        <input type="hidden" name="ID" value="=@Model.ID" />
+
+        <div class="form-group">
+            <label>
+                Title
+            </label>
+            <input class="form-control" name="Title" value="@Model.Title" />
+        </div>
+
+        <div class="form-group">
+            <label>
+               Category
+            </label>
+              <select class="form-control" name="CategoryID">
+                  @foreach (var category in Model.Categories)
+                  {
+                      var selected = category.ID == Model.CategoryID ? "selected" : string.Empty;
+
+                      <option value="@category.ID" @selected>@category.Name</option>
+
+                  }
+              </select>
+        </div>
+
+        <div class="form-group">
+            <label>
+                Description
+            </label>
+            <input class="form-control" name="Description" value="@Model.Description" />
+        </div>
+
+        <div class="form-group">
+            <label>
+                ActualAmount
+            </label>
+            <input class="form-control" name="ActualAmount" value="@Model.ActualAmount" />
+        </div>
+
+        <div class="form-group">
+            <label>
+                StartingTime
+            </label>
+            <input class="form-control" name="StartingTime" value="@Model.StartingTime" />
+        </div>
+
+        <div class="form-group">
+            <label>
+                EndingTime
+            </label>
+            <input class="form-control" name="EndingTime" value="@Model.EndingTime" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>
+            Select Picture
+        </label>
+        <input id="auctionPictures" name="AuctionPicture" type="file" multiple />
+        <div id="picturesArea"></div>
+        <input type="hidden" name="AuctionPictures" id="pictureIDs" />
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button class="btn btn-success" type="button" id="saveButton" data-dismiss="modal">
+            Save
+        </button>
+
+    </div>
+
+</form>
+
+<script src="~/Contents/vendor/jquery/jquery.js"></script>
+<script src="~/Contents/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<script>
+    RemoveImagesOnClick();
+
+    $("#saveButton").click(function () {
+
+        var ImageIDs = [];
+        $("#picturesArea.image").each(function () {
+            var ImageID = $(this).attr("data-id");
+
+            ImageIDs.push(ImageID);
+        });
+
+        $("#pictureIDs").val(ImageIDs.join());
+
+        $.ajax({
+            url: "@Url.Action("Edit", "Auctions")",
+            method: "post",
+            data: $("#editForm").serialize()
+        })
+            .done(function (response) {
+                $("#listingArea").html(response);
+                $("#formModal").modal('toggle');
+            });
+    });
+
+
+    $("#auctionPictures").change(function () {
+        debugger;
+
+        var pictures = this.files;
+
+        var picsData = new FormData();
+
+        for (var i = 0; i < pictures.length; i++) {
+            picsData.append("Picture", pictures[i]);
+        }
+
+             $.ajax({
+            url: "@Url.Action("UploadPictures", "Shared")",
+           method: "post",
+            data: picsData,
+            dateType: "json",
+            processData: false,
+            contentType: false
+
+        })
+        .done(function (responses) {
+               for (var i = 0; i < responses.length; i++) {
+                   var picResponse = responses[i];
+
+                    AttachNewImage(picResponse.pictureURL, picResponse.ID);
+
+               }
+
+            });
+    });
+
+</script>

@@ -1,0 +1,160 @@
+﻿@model OnlineShoppingStore.ViewModels.AuctionsListingViewModel
+@*@{
+
+    Layout = "~/Views/Shared/_AucLayout.cshtml";
+}*@
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                Title
+                @*@Html.DisplayNameFor(model=> model.Title)*@
+            </th>
+            <th>
+                Category
+                @*@Html.DisplayNameFor(model=> model.Title)*@
+            </th>
+            <th>
+                Description
+                @*@Html.DisplayNameFor(model => model.Description)*@
+            </th>
+            <th>
+                ActualAmount
+                @*@Html.DisplayNameFor(model=> model.ActualAmount)*@
+            </th>
+            <th>
+                StartingTime
+                @*@Html.DisplayNameFor(model=> model.StartingTime)*@
+            </th>
+            <th>
+                EndingTime
+                @*@Html.DisplayNameFor(model=> model.EndingTime)*@
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var auction in Model.Auctions)
+        {
+
+        <tr>
+            <td>
+                <input type="hidden" value="@auction.ID" />
+                @auction.Title
+            </td>
+            <td>
+                @auction.Category.Name
+            </td>
+            <td>
+                @auction.Description
+            </td>
+            <td>
+                @auction.ActualAmount
+            </td>
+            <td>
+                @auction.StartingTime
+            </td>
+            <td>
+                @auction.EndingTime
+            </td>
+            <td>
+                @*@Html.ActionLink("edit", "Edit", new { id = auction.ID }) |
+            @Html.ActionLink("delete", "Delete", new { id = auction.ID }) |*@
+
+                <button class="editButton btn btn-primary" data-id="@auction.ID" data-toggle="modal" data-target="#formModal">Edit</button>
+                <button class="deleteButton btn btn-danger" data-id="@auction.ID" data-toggle="modal" data-target="#deleteModal">Delete</button>
+            </td>
+
+        </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.Pager != null && Model.Pager.TotalPages > 0)
+{
+<nav arai-label="Page Navigation">
+    <ul class="pagination justify-content-center">
+        @if (Model.Pager.CurrentPage == 1)
+        {
+            <li class="page-item disabled">
+                <a class="page-link" href="#">Previous</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("AucIndex", "Auctions", new { pageNo = Model.Pager.CurrentPage - 1, categoryID = Model.CategoryID, searchTerm = Model.SearchTerm })">Previous</a>
+            </li>
+        }
+
+
+        @for (int page = Model.Pager.StartPage; page < Model.Pager.EndPage; page++)
+        {
+            var active = page == Model.Pager.CurrentPage ? "active" : string.Empty;
+            <li class="page-item @active">
+                <a class="page-link" href="@Url.Action("AucIndex", "Auctions", new { pageNo = page })">
+                    @page
+                </a>
+            </li>
+        }
+
+
+        @if (Model.Pager.CurrentPage == Model.Pager.EndPage)
+        {
+            <li class="page-item disabled">
+                <a class="page-link"  href="#">Next</a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item">
+                <a class="page-link" href="@Url.Action("AucIndex", "Auctions", new { pageNo = Model.Pager.CurrentPage + 1 })">Next</a>
+            </li>
+        }
+
+    </ul>
+</nav>
+}
+
+<script src="~/Contents/vendor/jquery/jquery.js"></script>
+<script src="~/Contents/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<script>
+    $(".editButton").click(function () {
+        debugger;
+        $.ajax({
+            url: "@Url.Action("Edit", "Auctions")",
+            method: "get",
+            data: {
+                ID: $(this).attr("data-id")
+            }
+
+        }).done(function (response) {
+            $("#contentArea").html(response)
+            $("#formModal").modal('toggle');
+        });
+    });
+
+    $(".deleteButton").click(function () {
+        $("#deleteModal").modal('toggle');
+        $('#mDeleteButton').attr("data-recordID", $(this).attr("data-id"));
+
+    });
+
+
+    //$('#deleteModal').on('show.bs.modal', function (event) {
+    //    var button = $(event.relatedTarget) //button that triggered hte modal
+    //    var recepient = button.data('id') // extract data from data-* attributes
+    //    var modal = $(this)
+
+    //    $('#deleteButton').attr("data-recordID", recepient)
+    //    //modal.find('#deleteRecord-ID').val(recepient)
+
+    //})
+</script>
+
+

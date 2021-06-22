@@ -1,0 +1,153 @@
+﻿@model OnlineShoppingStore.ViewModels.ProductListingViewModel
+
+@*@{
+        //ViewBag.Title = "Product";
+        Layout = "~/Views/Shared/_AucLayout.cshtml";
+    }*@
+
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                ProductName
+                @*@Html.DisplayNameFor(model=> model.Title)*@
+            </th>
+            <th>
+                Categories
+                @*@Html.DisplayNameFor(model => model.Description)*@
+            </th>
+            <th>
+                Description
+                @*@Html.DisplayNameFor(model => model.Description)*@
+            </th>
+            <th>
+                Quantity
+                @*@Html.DisplayNameFor(model=> model.ActualAmount)*@
+            </th>
+            <th>
+                Price
+                @*@Html.DisplayNameFor(model=> model.StartingTime)*@
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var product in Model.Product)
+        {
+
+            <tr>
+                <td>
+                    <input type="hidden" value="@product.ID" />
+                    @product.ProductName
+                </td>
+                <td>
+                    @product.Categories.Name
+                </td>
+                <td>
+                    @product.Description
+                </td>
+                <td>
+                    @product.Quantity
+                </td>
+                <td>
+                    @product.Price
+                </td>
+
+                <td>
+                    <button class="editButton btn btn-primary" data-id="@product.ProductID" data-toggle="modal" data-target="#formModal">Edit</button>
+                    <button class="deleteButton btn btn-danger" data-id="@product.ProductID" data-toggle="modal" data-target="#deleteModal">Delete</button>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.Pager != null && Model.Pager.TotalPages > 0)
+{
+
+
+    <nav aria-label="Page Navigation">
+        <ul class="pagination justify-content-center">
+            @if (Model.Pager.CurrentPage == 1)
+            {
+                <li class="page-item disabled ">
+                    <a class="page-link" href="#">Previous</a>
+                </li>
+
+            }
+            else
+            {
+                <li class="page-item ">
+                    <a class="page-link" href="@Url.Action("DashBoard", "Admin", new { pageNo = Model.Pager.CurrentPage - 1})">Previous</a>
+                </li>
+
+            }
+
+            @for (int page = Model.Pager.StartPage; page < Model.Pager.EndPage; page++)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("DashBoard", "Admin", new { pageNo = page })">
+                        @page
+                    </a>
+                </li>
+            }
+
+            @if (Model.Pager.CurrentPage == Model.Pager.EndPage)
+            {
+                <li class="page-link" href="#">Next</li>
+            }
+            else
+            {
+        <li class="page-item"> 
+            <a class="page-link" href="@Url.Action("DashBoard", "Admin", new { pageNo = Model.Pager.CurrentPage  + 1})">Next</a>
+        </li>
+                
+            }
+            
+        </ul>
+        </nav>
+
+        }
+
+
+        <script src="~/Contents/vendor/jquery/jquery.js"></script>
+        <script src="~/Contents/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+        <script>
+    $(".editButton").click(function () {
+        $.ajax({
+            url: "@Url.Action("Edit", "Auctions")",
+            method: "get",
+            data: {
+                ID: $(this).attr("data-id")
+            }
+
+        }).done(function (response) {
+            $("#contentArea").html(response)
+            $("#formModal").modal('toggle');
+        });
+    });
+
+    $(".deleteButton").click(function () {
+        $("#deleteModal").modal('toggle');
+        $('#mDeleteButton').attr("data-recordID", $(this).attr("data-id"));
+
+    });
+
+
+    //$('#deleteModal').on('show.bs.modal', function (event) {
+    //    var button = $(event.relatedTarget) //button that triggered hte modal
+    //    var recepient = button.data('id') // extract data from data-* attributes
+    //    var modal = $(this)
+
+    //    $('#deleteButton').attr("data-recordID", recepient)
+    //    //modal.find('#deleteRecord-ID').val(recepient)
+
+    //})
+        </script>
+

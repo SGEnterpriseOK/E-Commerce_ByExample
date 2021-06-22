@@ -1,0 +1,158 @@
+﻿@model OnlineShoppingStore.ViewModels.CreateProductsViewModel
+
+@{
+    //ViewBag.Title = "ProductAdd";
+    Layout = "~/Views/Shared/_AucLayout.cshtml";
+}
+
+<div class="modal-header">
+    <h5 class="modal-title">Add New Product</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<form id="createform" method="post" action="~/Views/Admin/ProductAdd.cshtml/">
+
+
+    <div class="modal-body">
+        <div class="form-group">
+            <label>
+                ProductName
+            </label>
+            <input class="form-control" name="ProductName" />
+        </div>
+        <div class="form-group">
+            <label>
+                Category
+            </label>
+            <select name="CategoriesID">
+                @foreach (var Cat in Model.Category )
+                {
+                   <option value="@Cat.ID">@Cat.Name</option> 
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>
+                CreatedDate
+            </label>
+            <input class="form-control" name="CreatedDate" />
+        </div>
+
+        <div>
+            <label>
+                Description
+            </label>
+            <textarea name="Description" rows="5" class="form-control"></textarea>
+            @*<input class="form-control" name="Description" />*@
+        </div>
+
+        <div class="form-group">
+            <label>
+                Quantity
+            </label>
+            <input class="form-control" name="Quantity" />
+        </div>
+
+        <div class="form-group">
+            <label>
+                Price
+            </label>
+            <input class="form-control" name="Price" />
+        </div>
+
+        <div class="form-group">
+            <label>
+                Select Picture
+            </label>
+            <input id="productPictures" name="ProductPictures" type="file" multiple />
+            <div id="picturesArea"></div>
+            <input type="hidden" name="ProductPictures" id="pictureIDs" />
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button class="btn btn-success" type="button" id="saveButton" data-dismiss="modal">
+            Save
+        </button>
+
+    </div>
+
+</form>
+
+
+<script src="~/Contents/vendor/jquery/jquery.js"></script>
+<script src="~/Contents/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<script>
+    $("#saveButton").click(function () {
+        debugger;
+
+        var ImageIDs = [];
+
+        $("#picturesArea.image").each(function () {
+            var ImageID = $(this).attr("data-id");
+            ImageIDs.push(ImageID);
+        });
+
+        $("#pictureIDs").val(ImageIDs.join());
+
+        $.ajax({
+            url: "@Url.Action("ProductAdd", "Admin")",
+            method: "post",
+            data: $("#createform").serialize()
+        })
+            .done(function (response) {
+                $("#ProductlistingArea").html(response);
+                $("#formModal").modal('toggle');
+
+            });
+    });
+
+    $("#productPictures").change(function () {
+       // debugger;
+
+        var pictures = this.files;
+
+        var picsData = new FormData();
+
+        for (var i = 0; i < pictures.length; i++) {
+
+            picsData.append("Picture", pictures[i]);
+        }
+
+        $.ajax({
+            url: "@Url.Action("UploadPictures", "Shared")",
+           method: "post",
+            data: picsData,
+            dateType: "json",
+            processData: false,
+            contentType: false
+
+        })
+        .done(function (responses) {
+
+               for (var i = 0; i < responses.length; i++) {
+                   var picResponse = responses[i];
+
+                    AttachNewImage(picResponse.pictureURL, picResponse.ID);
+
+               }
+
+            });
+    });
+
+    function AttachNewImage(ImageURL, ImageID) {
+       // debugger;
+        var $newimgHTML = $("#ImageTemplate").clone();
+
+        $newimgHTML.find(".image").attr("src", "/Contents/images/" + ImageURL);
+        $newimgHTML.find(".image").attr("data-id", ImageID);
+
+        $("#picturesArea").append($newimgHTML.html());
+
+        RemoveImagesOnClick();
+    }
+
+</script>

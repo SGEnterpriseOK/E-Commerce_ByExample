@@ -1,0 +1,175 @@
+﻿@model  OnlineShoppingStore.ViewModels.CreateAuctionsViewModel
+@*@{
+        @ViewBag.title = "Create";
+        Layout = "~/Views/Shared/_AucLayout.cshtml";
+    }*@
+
+<div class="modal-header">
+    <h5 class="modal-title">Create Auction</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<form id="createform" method="post" action="/Auctions/Create/">
+
+    
+    <div class="modal-body">
+        <div class="form-group">
+            <label>
+                Title
+            </label>
+            <input class="form-control" name="Title" value="@Model.Title" />
+        </div>
+
+        <div class="form-group">
+            <label>
+                Category
+            </label>
+            <select name="CategoryID">
+                @foreach (var cateory in Model.Categories)
+                {
+                    <option value="@cateory.ID">@cateory.Name</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label>
+                Description
+            </label>
+            <input class="form-control" name="Description" value="@Model.Description" />
+        </div>
+
+        <div class="form-group">
+            <label>
+                ActualAmount
+            </label>
+            <input class="form-control" name="ActualAmount" value="@Model.ActualAmount" />
+        </div>
+
+        <div class="form-group">
+            <label>
+                StartingTime
+            </label>
+            <input class="form-control" name="StartingTime" value="@Model.StartingTime" />
+        </div>
+
+        <div class="form-group">
+            <label>
+                EndingTime
+            </label>
+            <input class="form-control" name="EndingTime" value="@Model.EndingTime" />
+        </div>
+
+        <div class="form-group">
+            <label>
+                Select Picture
+            </label>
+            <input id="auctionPictures" class="form-control" name="AuctionPictures" type="file" multiple />
+            <div id="picturesArea" ></div>
+            <input type="hidden" name="AuctionPictures" id="pictureIDs" />
+        </div>
+
+        <div id="formErrors" class="form-group bg-danger" style="display:none">
+        </div>
+
+    </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button class="btn btn-success" type="button" id="saveButton" >
+                Save
+            </button>
+
+        </div>
+
+</form>
+
+
+<script src="~/Contents/vendor/jquery/jquery.js"></script>
+<script src="~/Contents/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<script>
+    $("#createForm").validate({
+        rules: {
+            Title: {
+                required: true,
+                minlength: 15,
+                maxlength: 150
+                
+            }
+        },
+        messages: {
+            Title: {
+                required: "Title is required.",
+                minlength: "Minimum Length is 15 characters.",
+                maxlength: "Maximum Length is 150 characters." 
+
+            }
+        }
+    });
+
+    $("#saveButton").click(function () { 
+        if ($("#createForm").valid) {
+            var ImageIDs = [];
+
+            $("#picturesArea.image").each(function () {
+                var ImageID = $(this).attr("data-id");
+                ImageIDs.push(ImageID);
+            });
+
+            $("#pictureIDs").val(ImageIDs.join());
+
+            $.ajax({
+                url: "@Url.Action("Create", "Auctions")",
+                method: "post",
+                data: $("#createform").serialize()
+            })
+                .done(function (response) {
+                    debugger;
+                    if (response.Success) {
+
+                        ReloadListing();
+                        $("#formModal").modal('toggle');
+                    }
+                    else {
+                        $("#formErrors").html(response.Error);
+                        $("#formErrors").show();
+                    }
+
+                });
+        }
+    });
+
+    $("#auctionPictures").change(function () {
+        debugger;
+        
+        var pictures = this.files;
+
+        var picsData = new FormData();
+
+        for (var i = 0; i < pictures.length; i++) {
+            picsData.append("Picture", pictures[i]);
+        }
+
+        $.ajax({
+            url: "@Url.Action("UploadPictures", "Shared")",
+           method: "post",
+            data: picsData,
+            dateType: "json",
+            processData: false,
+            contentType: false
+
+        })
+        .done(function (responses) {               
+               for (var i = 0; i < responses.length; i++) {
+                   var picResponse = responses[i];           
+   
+                    AttachNewImage(picResponse.pictureURL, picResponse.ID);
+
+               }               
+
+            });
+    });
+
+</script>
